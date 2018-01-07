@@ -266,7 +266,7 @@ public class AccountRestClient extends BaseWPComRestClient {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        add(WPComGsonRequest.buildGetRequest(url, params, AccountSettingsResponse.class,
+        add(WPComGsonRequest.buildGetRequest(url, params, AccountFetchUsernameSuggestionsResponsePayload.class,
                 new Listener<UsernameSuggestionsResponse>() {
                     @Override
                     public void onResponse(UsernameSuggestionsResponse response) {
