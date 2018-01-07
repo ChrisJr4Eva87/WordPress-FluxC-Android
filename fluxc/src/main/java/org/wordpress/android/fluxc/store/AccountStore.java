@@ -76,6 +76,13 @@ public class AccountStore extends Store {
         }
     }
 
+    public static class FetchUsernameSuggestionsPayload extends Payload<BaseNetworkError> {
+        public String name;
+        public FetchUsernameSuggestionsPayload(@NonNull String name) {
+            this.name = name;
+        }
+    }
+
     public static class PushAccountSettingsPayload extends Payload<BaseNetworkError> {
         public Map<String, Object> params;
         public PushAccountSettingsPayload() {
@@ -402,6 +409,36 @@ public class AccountStore extends Store {
         }
     }
 
+    public static class AccountFetchUsernameSuggestionsError implements OnChangedError {
+        public AccountFetchUsernameSuggestionsErrorType type;
+        public String message;
+
+        public AccountFetchUsernameSuggestionsError(@NonNull AccountFetchUsernameSuggestionsErrorType type,
+                                                    @NonNull String message) {
+            this.type = type;
+            this.message = message;
+        }
+    }
+
+    public enum AccountFetchUsernameSuggestionsErrorType {
+        REST_MISSING_CALLBACK_PARAM,
+        REST_NO_NAME,
+        GENERIC_ERROR;
+
+        public static AccountFetchUsernameSuggestionsErrorType fromString(String string) {
+            if (string != null) {
+                for (AccountFetchUsernameSuggestionsErrorType type
+                        : AccountFetchUsernameSuggestionsErrorType.values()) {
+                    if (string.equalsIgnoreCase(type.name())) {
+                        return type;
+                    }
+                }
+            }
+
+            return GENERIC_ERROR;
+        }
+    }
+
     public static class AuthEmailError implements OnChangedError {
         public AuthEmailErrorType type;
         public String message;
@@ -518,6 +555,9 @@ public class AccountStore extends Store {
             case FETCH_SETTINGS:
                 mAccountRestClient.fetchAccountSettings();
                 break;
+            case FETCH_USERNAME_SUGGESTIONS:
+                createFetchUsernameSuggestions((FetchUsernameSuggestionsPayload) payload);
+                break;
             case SEND_VERIFICATION_EMAIL:
                 mAccountRestClient.sendVerificationEmail();
                 break;
@@ -568,6 +608,9 @@ public class AccountStore extends Store {
                 break;
             case FETCHED_SETTINGS:
                 handleFetchSettingsCompleted((AccountRestPayload) payload);
+                break;
+            case FETCHED_USERNAME_SUGGESTIONS:
+                handleFetchUsernameSuggestionsCompleted((AccountRestPayload) payload);
                 break;
             case FETCHED_ACCOUNT:
                 handleFetchAccountCompleted((AccountRestPayload) payload);
@@ -664,6 +707,15 @@ public class AccountStore extends Store {
         }
     }
 
+    private void handleFetchUsernameSuggestionsCompleted(AccountRestPayload payload) {
+//        if (!checkError(payload, "Error fetching Username Suggestions via REST API (/users/username/suggestions)")) {
+//            mAccount.copyAccountSettingsAttributes(payload.account);
+//            updateDefaultAccount(mAccount, AccountAction.FETCHED_USERNAME_SUGGESTIONS);
+//        } else {
+//            emitAccountChangeError(AccountErrorType.SETTINGS_FETCH_ERROR);
+//        }
+    }
+
     private void handleSentVerificationEmail(NewAccountResponsePayload payload) {
         OnAccountChanged accountChanged = new OnAccountChanged();
         accountChanged.causeOfChange = AccountAction.SEND_VERIFICATION_EMAIL;
@@ -753,6 +805,10 @@ public class AccountStore extends Store {
         OnAccountChanged event = new OnAccountChanged();
         event.error = new AccountError(errorType, "");
         emitChange(event);
+    }
+
+    private void createFetchUsernameSuggestions(FetchUsernameSuggestionsPayload payload) {
+        mAccountRestClient.fetchUsernameSuggestions(payload.name);
     }
 
     private void createNewAccount(NewAccountPayload payload) {
