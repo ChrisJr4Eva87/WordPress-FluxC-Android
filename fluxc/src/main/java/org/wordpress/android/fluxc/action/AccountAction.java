@@ -11,6 +11,7 @@ import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.AccountRestPayload;
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.IsAvailableResponsePayload;
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.NewAccountResponsePayload;
+import org.wordpress.android.fluxc.store.AccountStore.FetchUsernameSuggestionsPayload;
 import org.wordpress.android.fluxc.store.AccountStore.NewAccountPayload;
 import org.wordpress.android.fluxc.store.AccountStore.PushAccountSettingsPayload;
 import org.wordpress.android.fluxc.store.AccountStore.PushSocialAuthPayload;
@@ -26,7 +27,7 @@ public enum AccountAction implements IAction {
     FETCH_ACCOUNT,          // request fetch of Account information
     @Action
     FETCH_SETTINGS,         // request fetch of Account Settings
-    @Action
+    @Action(payloadType = FetchUsernameSuggestionsPayload.class)
     FETCH_USERNAME_SUGGESTIONS,  // request fetch of Username Suggestions
     @Action
     SEND_VERIFICATION_EMAIL, // request verification email for unverified accounts
