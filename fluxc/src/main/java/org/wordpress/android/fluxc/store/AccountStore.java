@@ -18,6 +18,7 @@ import org.wordpress.android.fluxc.network.discovery.SelfHostedEndpointFinder;
 import org.wordpress.android.fluxc.network.discovery.SelfHostedEndpointFinder.DiscoveryError;
 import org.wordpress.android.fluxc.network.discovery.SelfHostedEndpointFinder.DiscoveryResultPayload;
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient;
+import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.AccountFetchUsernameSuggestionsResponsePayload;
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.AccountPushSettingsResponsePayload;
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.AccountPushSocialResponsePayload;
 import org.wordpress.android.fluxc.network.rest.wpcom.account.AccountRestClient.AccountPushUsernameResponsePayload;
@@ -192,6 +193,10 @@ public class AccountStore extends Store {
     public static class OnUsernameChanged extends OnChanged<AccountUsernameError> {
         public AccountUsernameActionType type;
         public String username;
+    }
+
+    public static class OnUsernameSuggestionsFetched extends OnChanged<AccountFetchUsernameSuggestionsError> {
+        public List<String> suggestions;
     }
 
     public static class OnDiscoveryResponse extends OnChanged<DiscoveryError> {
@@ -610,7 +615,7 @@ public class AccountStore extends Store {
                 handleFetchSettingsCompleted((AccountRestPayload) payload);
                 break;
             case FETCHED_USERNAME_SUGGESTIONS:
-                handleFetchUsernameSuggestionsCompleted((AccountRestPayload) payload);
+                handleFetchUsernameSuggestionsCompleted((AccountFetchUsernameSuggestionsResponsePayload) payload);
                 break;
             case FETCHED_ACCOUNT:
                 handleFetchAccountCompleted((AccountRestPayload) payload);
@@ -707,13 +712,11 @@ public class AccountStore extends Store {
         }
     }
 
-    private void handleFetchUsernameSuggestionsCompleted(AccountRestPayload payload) {
-//        if (!checkError(payload, "Error fetching Username Suggestions via REST API (/users/username/suggestions)")) {
-//            mAccount.copyAccountSettingsAttributes(payload.account);
-//            updateDefaultAccount(mAccount, AccountAction.FETCHED_USERNAME_SUGGESTIONS);
-//        } else {
-//            emitAccountChangeError(AccountErrorType.SETTINGS_FETCH_ERROR);
-//        }
+    private void handleFetchUsernameSuggestionsCompleted(AccountFetchUsernameSuggestionsResponsePayload payload) {
+        OnUsernameSuggestionsFetched event = new OnUsernameSuggestionsFetched();
+        event.error = payload.error;
+        event.suggestions = payload.suggestions;
+        emitChange(event);
     }
 
     private void handleSentVerificationEmail(NewAccountResponsePayload payload) {
